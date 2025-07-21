@@ -1,7 +1,17 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  reactStrictMode: true,
+  images: {
+    domains: ['images.unsplash.com', 'commondatastorage.googleapis.com'],
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      three: 'three',
+    };
+    return config;
+  },
+}
 
 export default nextConfig;
