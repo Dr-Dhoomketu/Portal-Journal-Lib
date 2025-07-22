@@ -5,6 +5,7 @@ import { Search, BookOpen, Play, Filter, Star, Clock, User, Menu, X, Volume2, Ma
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+
 const BookStashHomepage = () => {
   // All state variables
   const [showInterestModal, setShowInterestModal] = useState(false);
@@ -46,6 +47,51 @@ const BookStashHomepage = () => {
   const animationRef = useRef(null);
   const videoRef = useRef(null);
   const timerRef = useRef(null);
+
+  // Navigation handlers
+  const handleMyLibraryClick = () => router.push('/bookshelf');
+    const handleExploreCategoriesClick = () => {
+    router.push('/categories');
+  };
+  // Enhanced Search functionality
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const searchTerm = searchQuery.toLowerCase();
+      
+      const filteredBooks = sampleBooks.filter(book => 
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm) ||
+        book.subject.toLowerCase().includes(searchTerm) ||
+        book.category.toLowerCase().includes(searchTerm) ||
+        book.summary.toLowerCase().includes(searchTerm)
+      );
+
+      const filteredVideos = featuredVideos.filter(video => 
+        video.title.toLowerCase().includes(searchTerm) ||
+        video.author.toLowerCase().includes(searchTerm) ||
+        video.category.toLowerCase().includes(searchTerm) ||
+        video.description.toLowerCase().includes(searchTerm)
+      );
+
+      setSearchResults({
+        books: filteredBooks,
+        videos: filteredVideos,
+        total: filteredBooks.length + filteredVideos.length,
+        query: searchQuery
+      });
+
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchError('Search failed. Please try again.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   // Enhanced subject lists by category
   const subjectsByCategory = {
@@ -267,46 +313,6 @@ const BookStashHomepage = () => {
       }, 1000);
     }
     setIsReading(true);
-  };
-
-  // Enhanced Search functionality
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    setSearchError(null);
-
-    try {
-      const searchTerm = searchQuery.toLowerCase();
-      
-      const filteredBooks = sampleBooks.filter(book => 
-        book.title.toLowerCase().includes(searchTerm) ||
-        book.author.toLowerCase().includes(searchTerm) ||
-        book.subject.toLowerCase().includes(searchTerm) ||
-        book.category.toLowerCase().includes(searchTerm) ||
-        book.summary.toLowerCase().includes(searchTerm)
-      );
-
-      const filteredVideos = featuredVideos.filter(video => 
-        video.title.toLowerCase().includes(searchTerm) ||
-        video.author.toLowerCase().includes(searchTerm) ||
-        video.category.toLowerCase().includes(searchTerm) ||
-        video.description.toLowerCase().includes(searchTerm)
-      );
-
-      setSearchResults({
-        books: filteredBooks,
-        videos: filteredVideos,
-        total: filteredBooks.length + filteredVideos.length,
-        query: searchQuery
-      });
-
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchError('Search failed. Please try again.');
-    } finally {
-      setIsSearching(false);
-    }
   };
 
   // FIXED: Modal initialization to prevent blinking
@@ -587,6 +593,13 @@ const BookStashHomepage = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Join thousands of learners in interactive video sessions with expert instructors
           </p>
+          <button 
+            onClick={() => router.push('/live-videos')}
+            className="modern-btn text-lg px-8 py-4 mt-8 inline-flex items-center gap-3"
+          >
+            <Play className="w-5 h-5" />
+            Go to Live Videos
+          </button>
         </div>
         
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -638,7 +651,15 @@ const BookStashHomepage = () => {
           </div>
           
           <div className="space-y-6">
-            <h4 className="text-2xl font-bold text-gray-900">Trending Videos</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="text-2xl font-bold text-gray-900">Trending Videos</h4>
+              <button 
+                onClick={() => router.push('/live-videos')}
+                className="text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1"
+              >
+                View All <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
             
             <div className="space-y-4">
               {videosToShow.map((video, index) => (
@@ -1022,47 +1043,74 @@ const BookStashHomepage = () => {
             </div>
             
             {/* Navigation Links */}
-            <div className="hidden lg:flex items-center space-x-8 mx-8">
-              <a href="#" className="nav-link">Home</a>
-              <a href="#" className="nav-link">Categories</a>
-              <a href="#" className="nav-link">Live Videos</a>
-              <a href="#" className="nav-link">My Library</a>
+            <div className="hidden lg:flex items-center space-x-8">
+              <button
+                onClick={() => router.push('/')}
+                className="nav-link font-medium text-gray-700 hover:text-orange-600"
+              >
+                Home
+              </button>
+
+               <button
+        onClick={handleExploreCategoriesClick}
+        className="nav-link font-medium text-gray-700 hover:text-orange-600 flex items-center gap-2"
+      >
+        <Target className="w-4 h-4" />
+        Categories
+      </button>
+               
+
+              <button
+                onClick={() => router.push('/live-videos')}
+                className="nav-link font-medium text-gray-700 hover:text-orange-600 flex items-center gap-2"
+              >
+                <Play className="w-4 h-4" />
+                Live Videos
+              </button>
+              
+
+              <button
+                onClick={handleMyLibraryClick}
+                className="nav-link font-medium text-gray-700 hover:text-orange-600 flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4" />
+                My Library
+              </button>
             </div>
             
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-6">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input 
-                  type="text" 
-                  placeholder="Search books, videos, topics..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-12 pr-20 py-3 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-gray-900 placeholder-gray-500"
-                />
-                <button
-                  onClick={handleSearch}
-                  disabled={isSearching || !searchQuery.trim()}
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 rounded-xl text-sm font-medium transition-all ${
-                    isSearching || !searchQuery.trim()
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg'
-                  }`}
-                >
-                  {isSearching ? 'Searching...' : 'Search'}
-                </button>
-              </div>
-              
+            <div className="flex-1 max-w-md mx-6 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+              <input
+                type="text"
+                className="w-full pl-12 pr-24 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl
+                           focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500
+                           text-sm text-gray-900 placeholder-gray-500"
+                placeholder="Search books, videos, topics…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+
+              <button
+                onClick={handleSearch}
+                disabled={isSearching || !searchQuery.trim()}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 rounded-xl text-sm font-medium
+                  ${isSearching || !searchQuery.trim()
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+              >
+                {isSearching ? '…' : 'Search'}
+              </button>
+
               {searchResults && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
-                  Found {searchResults.total} results
-                  <button 
-                    onClick={() => setSearchResults(null)}
-                    className="float-right text-orange-600 hover:text-orange-700"
-                  >
-                    Clear
-                  </button>
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200
+                                rounded-xl shadow-2xl z-50 p-4 text-sm">
+                  Found {searchResults.total} results for "{searchResults.query}"
+                  <button
+                    onClick={() => { setSearchResults(null); setSearchQuery(''); }}
+                    className="float-right text-orange-600">Clear</button>
                 </div>
               )}
             </div>
@@ -1243,3 +1291,7 @@ const BookStashHomepage = () => {
 };
 
 export default BookStashHomepage;
+
+
+
+
