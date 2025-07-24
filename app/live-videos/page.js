@@ -13,6 +13,8 @@ const LiveVideoPage = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const carouselRef = useRef(null);
   const videoRef = useRef(null);
+  
+
 
   // Mock live video data for carousel
   const liveVideos = [
@@ -325,6 +327,10 @@ const LiveVideoPage = () => {
         <p className="text-xl text-gray-700 max-w-3xl mx-auto">
           Join interactive live sessions with expert instructors from around the world
         </p>
+      </div>
+      <div>
+
+
       </div>
 
       {/* Cylindrical Video Carousel */}

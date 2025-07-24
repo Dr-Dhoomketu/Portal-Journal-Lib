@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 const BookStashHomepage = () => {
   // All state variables
-  const [showInterestModal, setShowInterestModal] = useState(false);
+  //const [showInterestModal, setShowInterestModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
@@ -31,6 +31,11 @@ const BookStashHomepage = () => {
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [isReading, setIsReading] = useState(false);
+  const [showSchoolPopup, setShowSchoolPopup] = useState(false);
+const [username, setUsername] = useState('');
+const [schoolOption, setSchoolOption] = useState('');
+const [courseOption, setCourseOption] = useState('');
+
   
   // Search functionality state
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,10 +43,23 @@ const BookStashHomepage = () => {
   const [searchError, setSearchError] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   
-  // NextAuth session hook and router
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  
+ // NextAuth session hook and router
+const { data: session, status } = useSession();
+const router = useRouter();
+
+// Popup and user info states
+
+
+
+// Force Google login and show popup when authenticated
+useEffect(() => {
+  if (status === 'unauthenticated') {
+    signIn('google');
+  } else if (status === 'authenticated') {
+    setShowSchoolPopup(true);
+  }
+}, [status]);
+
   // Refs
   const mountRef = useRef(null);
   const animationRef = useRef(null);
@@ -368,7 +386,7 @@ const BookStashHomepage = () => {
         completedAt: new Date().toISOString()
       }));
       
-      setShowInterestModal(false);
+      setShowSchoolPopup(false);
       setIsNewUser(false);
       
       const routeMap = {
@@ -874,8 +892,8 @@ const BookStashHomepage = () => {
   );
 
   // Interest Modal Component
-  const InterestModal = () => (
-    <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${showInterestModal ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+  const SchoolPopup = () => (
+    <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${showSchoolPopup ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className="floating-card max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -883,7 +901,7 @@ const BookStashHomepage = () => {
             <p className="text-gray-600">Let's personalize your learning experience</p>
           </div>
           <button 
-            onClick={() => setShowInterestModal(false)} 
+            onClick={() => setShowSchoolPopup(false)} 
             className="text-gray-500 hover:text-gray-700 transition-colors p-2"
           >
             <X className="w-6 h-6" />
@@ -1126,7 +1144,7 @@ const BookStashHomepage = () => {
               </button>
               
               <button 
-                onClick={() => setShowInterestModal(true)}
+                onClick={() => setShowSchoolPopup(true)}
                 className="modern-btn flex items-center gap-2 text-sm px-5 py-2.5"
               >
                 <GraduationCap className="w-4 h-4" />
@@ -1283,7 +1301,7 @@ const BookStashHomepage = () => {
       </div>
 
       {/* Modals */}
-      <InterestModal />
+      <SchoolPopup />
       <GoogleLoginModal />
       <ReadingTimerModal />
     </div>
