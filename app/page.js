@@ -350,7 +350,7 @@ useEffect(() => {
       
       const timer = setTimeout(() => {
         setShowWelcomeNotification(false);
-        setShowInterestModal(true);
+        setShowSchoolPopup(true);
         setHasInitialized(true);
       }, 2000);
       

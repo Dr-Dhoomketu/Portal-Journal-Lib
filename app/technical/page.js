@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, Code, Database, Cpu, Cloud, Shield, Brain, Play, BookOpen, Heart, Bookmark, ShoppingCart } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
-import { useCart } from '../../context/CartContext'; // Adjust the path as needed
+import { useCart } from '../../context/CartContext'; // Adjust path as necessary
 
 // Breadcrumbs component
 function Breadcrumbs() {
@@ -29,10 +29,10 @@ function Breadcrumbs() {
               {isLast ? (
                 <span className="font-semibold">{text}</span>
               ) : (
-                <>
+                <React.Fragment key={href}>
                   <Link href={href} className="hover:underline">{text}</Link>
                   <span className="mx-1 select-none">/</span>
-                </>
+                </React.Fragment>
               )}
             </li>
           );
@@ -55,23 +55,20 @@ const TechIcons = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {icons.map((item, index) => {
-        const Icon = item.icon;
-        return (
-          <div
-            key={item.name}
-            className="absolute animate-bounce text-blue-500"
-            style={{
-              left: `${15 + index * 15}%`,
-              top: `${20 + (index % 2) * 30}%`,
-              animationDelay: `${item.delay}s`,
-              animationDuration: '3s',
-            }}
-          >
-            <Icon className="w-8 h-8" />
-          </div>
-        );
-      })}
+      {icons.map(({ icon: Icon, name, delay }, index) => (
+        <div
+          key={name}
+          className="absolute animate-bounce text-blue-500"
+          style={{
+            left: `${15 + index * 15}%`,
+            top: `${20 + (index % 2) * 30}%`,
+            animationDelay: `${delay}s`,
+            animationDuration: '3s',
+          }}
+        >
+          <Icon className="w-8 h-8" />
+        </div>
+      ))}
     </div>
   );
 };
@@ -128,6 +125,7 @@ const BookCard = ({ book }) => {
   );
 };
 
+// Floating Cart Button
 const FloatingCartButton = () => {
   const { cartItems } = useCart();
 
@@ -143,6 +141,7 @@ const FloatingCartButton = () => {
     </Link>
   );
 };
+
 export default function TechnicalPage() {
   const { data: session, status } = useSession();
   const user = session?.user;
@@ -151,7 +150,6 @@ export default function TechnicalPage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { cartItems } = useCart();
 
   const technicalSubjects = [
     'Programming',

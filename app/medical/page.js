@@ -93,7 +93,6 @@ const FloatingCartButton = () => {
   );
 };
 
-export default FloatingCartButton;
 // Book Card for each book
 const BookCard = ({ book }) => {
   const { addToCart, cartItems } = useCart();
